@@ -1,0 +1,4 @@
+github.com/akzj/block-queue v0.2.0 h1:2QyBGzWBOzWW3qLn1dAEucwwv9z3x7PrncR7NcrjRuk=
+github.com/akzj/block-queue v0.2.0/go.mod h1:Z/GvRR21N4ADNr/ggpYWRLm3VIrfESi8TtOQ/CiZjts=
+github.com/eclipse/paho.mqtt.golang v1.2.0 h1:1F8mhG9+aO5/xpdtFkW4SxOJB67ukuDC3t2y2qayIX0=
+github.com/eclipse/paho.mqtt.golang v1.2.0/go.mod h1:H9keYFcgq3Qr5OUJm/JZI/i6U7joQ8SYLhZwfeOo6Ts=
