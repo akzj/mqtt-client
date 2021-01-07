@@ -59,11 +59,14 @@ func (s *Subscribe) MarshalTo(buffer []byte) error {
 func (s *Subscribe) Unmarshal(data []byte) error {
 	s.MessageID = binary.BigEndian.Uint16(data)
 	data = data[2:]
+
 	for len(data) > 0 {
-		slen := binary.BigEndian.Uint16(data)
+		dataLength := binary.BigEndian.Uint16(data)
 		data = data[2:]
-		sbuff := data[:slen]
-		s.Topics = append(s.Topics, *(*string)(unsafe.Pointer(&sbuff)))
+		dataBuffer := data[:dataLength]
+		data = data[dataLength:]
+		s.Topics = append(s.Topics, *(*string)(unsafe.Pointer(&dataBuffer)))
+
 		s.Qoss = append(s.Qoss, data[0])
 		data = data[1:]
 	}

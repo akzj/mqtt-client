@@ -35,12 +35,16 @@ func (s *UnSubscribe) MarshalTo(buffer []byte) error {
 	}
 	_ = s.Header.MarshalTo(buffer)
 	buffer = buffer[s.Header.Size():]
+
 	binary.BigEndian.PutUint16(buffer, s.MessageID)
 	buffer = buffer[2:]
+
 	for i := range s.Topics {
 		topic := &s.Topics[i]
+
 		binary.BigEndian.PutUint16(buffer, uint16(len(*topic)))
 		buffer = buffer[2:]
+
 		copy(buffer, *topic)
 		buffer = buffer[len(*topic):]
 	}
@@ -51,10 +55,11 @@ func (s *UnSubscribe) Unmarshal(data []byte) error {
 	s.MessageID = binary.BigEndian.Uint16(data)
 	data = data[2:]
 	for len(data) > 0 {
-		slen := binary.BigEndian.Uint16(data)
+		dataLength := binary.BigEndian.Uint16(data)
 		data = data[2:]
-		sbuff := data[:slen]
-		s.Topics = append(s.Topics, *(*string)(unsafe.Pointer(&sbuff)))
+		dataBuffer := data[:dataLength]
+		data = data[dataLength:]
+		s.Topics = append(s.Topics, *(*string)(unsafe.Pointer(&dataBuffer)))
 	}
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	paho "github.com/eclipse/paho.mqtt.golang/packets"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -57,6 +58,21 @@ func TestPublish(t *testing.T) {
 		t.Error("publish marshal failed")
 		fmt.Println(buffer.Bytes())
 		fmt.Println(data2)
+	}
+
+	p2, d, err := UnmarshalPacket(bytes.NewReader(data))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reflect.DeepEqual(d, data) == false {
+		fmt.Println(data)
+		fmt.Println(d)
+		t.Fatal("UnmarshalPacket failed", len(data), len(data))
+	}
+	if reflect.DeepEqual(&p, p2) == false {
+		fmt.Println(p)
+		fmt.Println(p2)
+		t.Fatal("UnmarshalPacket failed")
 	}
 
 }
@@ -114,10 +130,13 @@ func BenchmarkPublish_Unmarshal(b *testing.B) {
 		Payload:   []byte(strings.Repeat("hello", 1024)),
 	}
 	data, _ := p.Marshal()
-	data = data[p.Header.Size():]
+	reader := bytes.NewReader(data)
 	for i := 0; i < b.N; i++ {
-		var nn Publish
-		nn.Unmarshal(data)
+		_, _, err := UnmarshalPacket(reader)
+		if err != nil {
+			b.Fatal("UnmarshalPacket failed")
+		}
+		reader.Reset(data)
 	}
 }
 
@@ -140,7 +159,7 @@ func BenchmarkPahoUnpack(b *testing.B) {
 
 	reader := bytes.NewReader(buffer.Bytes())
 	for i := 0; i < b.N; i++ {
-		_,err := paho.ReadPacket(reader)
+		_, err := paho.ReadPacket(reader)
 		if err != nil {
 			b.Fatalf(err.Error())
 		}

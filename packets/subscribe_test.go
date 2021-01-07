@@ -46,4 +46,12 @@ func TestSubscribe(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	var sub2 = Subscribe{
+		Header: sub.Header,
+	}
+	sub2.Unmarshal(data[sub.Header.Size():])
+	if reflect.DeepEqual(sub, sub2) == false {
+		t.Fatal("Unmarshal")
+	}
 }
