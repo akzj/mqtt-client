@@ -1,5 +1,7 @@
 package packets
 
+import "io"
+
 type Header struct {
 	MessageType     byte
 	Dup             bool
@@ -8,7 +10,7 @@ type Header struct {
 	RemainingLength int
 }
 
-func (h Header) Size() int {
+func (h *Header) Size() int {
 	var size = 1
 	length := h.RemainingLength
 	for {
@@ -25,13 +27,16 @@ func (h Header) Size() int {
 	return size
 }
 
-func (h Header) Marshal() ([]byte, error) {
+func (h *Header) Marshal() ([]byte, error) {
 	buffer := make([]byte, h.Size())
 	_ = h.MarshalTo(buffer)
 	return buffer, nil
 }
 
-func (h Header) MarshalTo(buffer []byte) error {
+func (h *Header) MarshalTo(buffer []byte) error {
+	if len(buffer) < h.Size() {
+		return io.ErrShortBuffer
+	}
 	var pos = 1
 	var flag byte
 	flag = h.MessageType << 4

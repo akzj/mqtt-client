@@ -10,7 +10,7 @@ import (
 
 func TestPublish(t *testing.T) {
 	p := Publish{
-		header: Header{
+		Header: Header{
 			MessageType:     PublishType,
 			Dup:             true,
 			Qos:             2,
@@ -47,9 +47,9 @@ func TestPublish(t *testing.T) {
 	}
 
 	var np Publish
-	np.header = p.header
+	np.Header = p.Header
 
-	np.Unmarshal(data[np.header.Size():])
+	np.Unmarshal(data[np.Header.Size():])
 
 	data2, _ := np.Marshal()
 
@@ -82,7 +82,7 @@ func BenchmarkPahoPublishWrite(b *testing.B) {
 
 func BenchmarkPublish_Marshal(b *testing.B) {
 	p := Publish{
-		header: Header{
+		Header: Header{
 			MessageType:     PublishType,
 			Dup:             true,
 			Qos:             2,
@@ -102,7 +102,7 @@ func BenchmarkPublish_Marshal(b *testing.B) {
 func BenchmarkPublish_Unmarshal(b *testing.B) {
 	b.ReportAllocs()
 	p := Publish{
-		header: Header{
+		Header: Header{
 			MessageType:     PublishType,
 			Dup:             true,
 			Qos:             2,
@@ -114,7 +114,7 @@ func BenchmarkPublish_Unmarshal(b *testing.B) {
 		Payload:   []byte(strings.Repeat("hello", 1024)),
 	}
 	data, _ := p.Marshal()
-	data = data[p.header.Size():]
+	data = data[p.Header.Size():]
 	for i := 0; i < b.N; i++ {
 		var nn Publish
 		nn.Unmarshal(data)
@@ -138,10 +138,12 @@ func BenchmarkPahoUnpack(b *testing.B) {
 	var buffer = new(bytes.Buffer)
 	pp.Write(buffer)
 
+	reader := bytes.NewReader(buffer.Bytes())
 	for i := 0; i < b.N; i++ {
-		_,err := paho.ReadPacket(bytes.NewReader(buffer.Bytes()))
+		_,err := paho.ReadPacket(reader)
 		if err != nil {
 			b.Fatalf(err.Error())
 		}
+		reader.Reset(buffer.Bytes())
 	}
 }
