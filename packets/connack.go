@@ -23,6 +23,8 @@ func (c *ConnAck) MarshalTo(buffer []byte) error {
 	if len(buffer) < c.Size() {
 		return io.ErrShortBuffer
 	}
+	c.Header.MarshalTo(buffer)
+	buffer = buffer[c.Header.Size():]
 	if c.SessionPresent {
 		buffer[0] = 1
 	}
