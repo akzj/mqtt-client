@@ -1,4 +1,4 @@
-module github.com/akzj/mqttclient
+module github.com/akzj/mqtt-client
 
 go 1.15
 
